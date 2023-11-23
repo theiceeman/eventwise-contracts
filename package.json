@@ -5,6 +5,7 @@
   "author": "kelvin <okorieebube1@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "@chainlink/contracts": "^0.8.0",
     "@openzeppelin/contracts": "^4.4.1",
     "hardhat": "^2.19.0"
   },
