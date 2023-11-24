@@ -24,8 +24,10 @@
     "compile": "npx hardhat compile",
     "test": "hardhat test --network hardhat",
     "run": "npx hardhat run --network hardhat scripts/run.js",
-    "test:timelock": "hardhat test --network hardhat ./test/TimeLock-test.js",
-    "deploy:localhost": "npx hardhat run --network localhost scripts/run.js"
+    "test:test": "hardhat test --network hardhat ./test/Test.js",
+    "test:localhost": "hardhat test --network localhost ./test/Test.js",
+    "deploy:localhost": "npx hardhat run --network localhost scripts/run.js",
+    "fork": "npx hardhat node --fork https://eth-sepolia.g.alchemy.com/v2/[API]"
   },
   "browserslist": {
     "production": [

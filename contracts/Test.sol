@@ -1,8 +1,8 @@
 //SPDX-License-Identifier: MIT
-pragma solidity ^0.8.7;
+pragma solidity ^0.8.1;
 
 import "@chainlink/contracts/src/v0.8/ChainlinkClient.sol";
-import "@chainlink/contracts/src/v0.8/ConfirmedOwner.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
  * Request testnet LINK and ETH here: https://faucets.chain.link/
@@ -13,14 +13,14 @@ import "@chainlink/contracts/src/v0.8/ConfirmedOwner.sol";
  * THIS IS AN EXAMPLE CONTRACT THAT USES UN-AUDITED CODE.
  */
 
-contract LinkWellUint256ConsumerContractExample is ChainlinkClient, ConfirmedOwner {
+contract LinkWellUint256ConsumerContractExample is Ownable, ChainlinkClient {
     using Chainlink for Chainlink.Request;
 
 	address private oracleAddress;
     bytes32 private jobId;
     uint256 private fee;
     
-    constructor() ConfirmedOwner(msg.sender) {
+    constructor()  {
         setChainlinkToken(0x779877A7B0D9E8603169DdbD7836e478b4624789);
         setOracleAddress(0x0FaCf846af22BCE1C7f88D1d55A038F27747eD2B);
         setJobId("a8356f48569c434eaa4ac5fcb4db5cc0");

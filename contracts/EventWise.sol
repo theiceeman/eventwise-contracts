@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.7;
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -68,7 +68,9 @@ contract EventWise is Ownable, ChainlinkClient {
     event ClaimInitiated(
         address indexed user,
         uint256 indexed eventId,
-        uint256 date
+        uint256 date,
+        bytes32 requestId,
+        string reason
     );
     event ClaimFulfilled(
         address indexed user,
@@ -90,7 +92,7 @@ contract EventWise is Ownable, ChainlinkClient {
     }
 
     function createPolicy(uint256 _avgEventCost) external {
-        require(_avgEventCost > 0, "zero amount");
+        require(_avgEventCost > 0, "zero amount!");
 
         uint256 premium = _avgEventCost.mul(PREMIUM_PERCENTAGE) / 100;
         InsurancePolicy[msg.sender] = Policy(_avgEventCost, premium);
@@ -116,7 +118,7 @@ contract EventWise is Ownable, ChainlinkClient {
         emit EventCreated(msg.sender, latestEventId[msg.sender]);
     }
 
-    function initiateClaim(uint256 eventId) external {
+    function initiateClaim(uint256 eventId, string memory reason) external {
         require(!Claims[msg.sender][eventId].isExists, "claim exists!");
 
         Claims[msg.sender][eventId] = ClaimDetail(Status.PENDING, 0, true);
@@ -124,7 +126,13 @@ contract EventWise is Ownable, ChainlinkClient {
         bytes32 requestId = _request(_event.latitude, _event.longitude);
         Requests[requestId] = RequestDetail(msg.sender, eventId);
 
-        emit ClaimInitiated(msg.sender, eventId, block.timestamp);
+        emit ClaimInitiated(
+            msg.sender,
+            eventId,
+            block.timestamp,
+            requestId,
+            reason
+        );
     }
 
     function fulfill(
@@ -144,11 +152,11 @@ contract EventWise is Ownable, ChainlinkClient {
             "insufficient funds!"
         );
 
-        ClaimDetail storage _claim = Claims[msg.sender][eventId];
-        require(_claim.status != Status.CLAIMED, "insufficient funds!");
+        ClaimDetail storage claim = Claims[msg.sender][eventId];
+        require(claim.status != Status.CLAIMED, "already claimed!");
 
-        if (_claim.weatherCondition >= 200 && _claim.weatherCondition < 800) {
-            _claim.status = Status.CLAIMED;
+        if (claim.weatherCondition >= 200 && claim.weatherCondition < 800) {
+            claim.status = Status.CLAIMED;
             token.safeTransfer(msg.sender, _event.cost);
 
             emit ClaimCompleted(msg.sender, eventId, block.timestamp);
