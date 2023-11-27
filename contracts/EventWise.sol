@@ -19,13 +19,6 @@ contract EventWise is Ownable, ChainlinkClient {
         uint256 avgEventCost;
         uint256 premiumAmount;
     }
-    struct Event {
-        string name;
-        string latitude;
-        string longitude;
-        uint256 cost;
-        uint256 date;
-    }
     struct EventDetail {
         string name;
         string latitude;
@@ -107,12 +100,13 @@ contract EventWise is Ownable, ChainlinkClient {
         emit PremiumPaid(msg.sender, amount, block.timestamp);
     }
 
-    function createEvent(Event memory newEvent) external {
-        string memory name = newEvent.name;
-        string memory latitude = newEvent.latitude;
-        string memory longitude = newEvent.longitude;
-        uint256 cost = newEvent.cost;
-        uint256 date = newEvent.date;
+    function createEvent(
+        string memory name,
+        string memory latitude,
+        string memory longitude,
+        uint256 cost,
+        uint256 date
+    ) external {
         _storeEvent(msg.sender, name, latitude, longitude, cost, date);
 
         emit EventCreated(msg.sender, latestEventId[msg.sender]);

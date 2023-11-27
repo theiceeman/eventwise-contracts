@@ -7,7 +7,9 @@
   "dependencies": {
     "@chainlink/contracts": "^0.8.0",
     "@openzeppelin/contracts": "^4.4.1",
-    "hardhat": "^2.19.0"
+    "dotenv": "^16.3.1",
+    "hardhat": "^2.19.0",
+    "web3": "1.8.1"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.0",
@@ -27,6 +29,7 @@
     "test:test": "hardhat test --network hardhat ./test/Test.js",
     "test:localhost": "hardhat test --network localhost ./test/Test.js",
     "deploy:localhost": "npx hardhat run --network localhost scripts/run.js",
+    "deploy:sepolia": "npx hardhat run --network sepolia scripts/deploy.js",
     "fork": "npx hardhat node --fork https://eth-sepolia.g.alchemy.com/v2/[API]"
   },
   "browserslist": {
