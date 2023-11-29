@@ -9,12 +9,17 @@ require('dotenv').config()
  */
 
 const PRIVATE_KEY_1 = process.env.PRIVATE_KEY_1;
+const PRIVATE_KEY_2 = process.env.PRIVATE_KEY_2;
 
 
 module.exports = {
   defaultNetwork: "hardhat",
   networks: {
     hardhat: {},
+    localhost: {
+      url: 'http://127.0.0.1:8545/',
+      accounts: [PRIVATE_KEY_1,PRIVATE_KEY_2]
+    },
     sepolia: {
       url: process.env.SEPOLIA_RPC,
       accounts: [PRIVATE_KEY_1]

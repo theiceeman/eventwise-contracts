@@ -18,6 +18,7 @@ contract EventWise is Ownable, ChainlinkClient {
     struct Policy {
         uint256 avgEventCost;
         uint256 premiumAmount;
+        bool isExists;
     }
     struct EventDetail {
         string name;
@@ -25,6 +26,7 @@ contract EventWise is Ownable, ChainlinkClient {
         string longitude;
         uint256 cost;
         uint256 date;
+        bool isExists;
     }
     struct RequestDetail {
         address user;
@@ -88,7 +90,7 @@ contract EventWise is Ownable, ChainlinkClient {
         require(_avgEventCost > 0, "zero amount!");
 
         uint256 premium = _avgEventCost.mul(PREMIUM_PERCENTAGE) / 100;
-        InsurancePolicy[msg.sender] = Policy(_avgEventCost, premium);
+        InsurancePolicy[msg.sender] = Policy(_avgEventCost, premium, true);
 
         emit PolicyCreated(msg.sender, premium, block.timestamp);
     }
@@ -211,7 +213,8 @@ contract EventWise is Ownable, ChainlinkClient {
             _latitude,
             _longitude,
             _cost,
-            _date
+            _date,
+            true
         );
         latestEventId[_address] = eventId;
     }

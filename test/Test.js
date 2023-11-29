@@ -9,9 +9,11 @@ describe("EventWise", function () {
 
         weth = await ethers.getContractFactory("ERC20Token");
         WETH = await weth.deploy("Wrapped Ether", "WETH");
+        console.log("WETH deployed to:", WETH.address);
 
         EventWise = await ethers.getContractFactory("EventWise");
         eventWise = await EventWise.deploy(WETH.address);
+        console.log("eventWise deployed to:", eventWise.address);
 
         await WETH.transfer(user.address, parseEther("100000"));
     })
@@ -77,12 +79,12 @@ describe("EventWise", function () {
                 longitude: '7.524058',
                 latitude: '6.418484',
                 cost: parseEther("35000"),
-                date: '1700789948'
+                date: 1700789948
             }
 
             let txn = await eventWise
                 .connect(user)
-                .createEvent(event);
+                .createEvent(event.name, event.longitude, event.latitude, event.cost, event.date);
             let reciept = await txn.wait();
 
             expect(reciept).to.emit(EventWise, "EventCreated");
