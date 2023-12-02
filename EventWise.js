@@ -1,10 +1,13 @@
 const Web3 = require('web3');
 const { abi: eventWiseAbi } = require('./artifacts/contracts/EventWise.sol/EventWise.json');
+const { BigNumber, getSigners } = require('ethers');
+const { parseEther } = require('ethers/lib/utils');
+const hre = require("hardhat");
 require('dotenv').config()
 
 
-const EVENTWISE_CONTRACT_ADDRESS = '0x3217DbEc365736148f8d7DFBCFD865e90DaB4B79';
-const USDT_CONTRACT_ADDRESS = '0x6d7B7DE1f0114c11b8739b779d0C1dE5aF88f482';
+const EVENTWISE_CONTRACT_ADDRESS = '0xDeee23398Bb90727a2122b4EcB61d55aD6467B33';
+const USDT_CONTRACT_ADDRESS = '0xE1C82c45bD7faBA5960c2e6C134eb9425b88d160';
 
 
 class EventWise {
@@ -14,8 +17,8 @@ class EventWise {
 
     constructor(_client, _fromAddress) {
         this.client = _client;
-        this.contract = new client.eth.Contract(eventWiseAbi, EVENTWISE_CONTRACT_ADDRESS.trim())
         this.fromAddress = _fromAddress
+        this.contract = new this.client.eth.Contract(eventWiseAbi, EVENTWISE_CONTRACT_ADDRESS.trim())
     }
 
     async viewPolicy(address) {
@@ -71,7 +74,7 @@ class EventWise {
 
     async createPolicy(_avgEventCost) {
         try {
-            let action = await this.contract.methods.createPolicy(_avgEventCost);
+            let action = await this.contract.methods.createPolicy(parseEther(_avgEventCost));
             let gas = Math.floor((await action.estimateGas({ from: this.fromAddress })) * 1.4);
 
             let txn = await this._sendTransaction(action, gas)
@@ -99,7 +102,8 @@ class EventWise {
 
     async createEvent(name, lat, long, cost, date) {
         try {
-            let action = await this.contract.methods.createEvent(name, lat, long, cost, date);
+            let _cost = parseEther(cost)
+            let action = await this.contract.methods.createEvent(name, lat, long, _cost, date);
             let gas = Math.floor((await action.estimateGas({ from: this.fromAddress })) * 1.4);
 
             let txn = await this._sendTransaction(action, gas)
@@ -151,20 +155,41 @@ class EventWise {
 
 }
 
-// const client = Web3(process.env.SEPOLIA_RPC);
-let client = new Web3('http://127.0.0.1:8545/')
+async function main() {
+    const client = new Web3(process.env.SEPOLIA_RPC);
+    // let client = new Web3('http://127.0.0.1:8545/')
+    const [user] = await hre.ethers.getSigners();
 
-// new EventWise(client).viewPolicy('0x99713faE9B01E427F6f64dcebE50209B9a717977')
-//     .then((viewPolicy) => { console.log({ viewPolicy }) });
-
-
-// new EventWise(client).viewUserEvents('0x99713faE9B01E427F6f64dcebE50209B9a717977')
-//     .then((viewUserEvents) => { console.log({ viewUserEvents }) });
+    // new EventWise(client).viewPolicy('0x99713faE9B01E427F6f64dcebE50209B9a717977')
+    //     .then((viewPolicy) => { console.log({ viewPolicy }) });
 
 
-// new EventWise(client).viewPremiumPayments('0x99713faE9B01E427F6f64dcebE50209B9a717977')
-//     .then((viewPremiumPayments) => { console.log({ viewPremiumPayments }) });
+    // new EventWise(client).viewUserEvents('0x99713faE9B01E427F6f64dcebE50209B9a717977')
+    //     .then((viewUserEvents) => { console.log({ viewUserEvents }) });
 
 
-new EventWise(client).viewClaims('0x99713faE9B01E427F6f64dcebE50209B9a717977')
-    .then((viewClaims) => { console.log({ viewClaims }) });
+    // new EventWise(client).viewPremiumPayments('0x99713faE9B01E427F6f64dcebE50209B9a717977')
+    //     .then((viewPremiumPayments) => { console.log({ viewPremiumPayments }) });
+
+
+    // new EventWise(client).viewClaims('0x99713faE9B01E427F6f64dcebE50209B9a717977')
+    //     .then((viewClaims) => { console.log({ viewClaims }) });
+
+    new EventWise(client, user.address)
+        .createPolicy('50000')
+        .then((createEvent) => { console.log({ createEvent }) });
+
+
+    // let event = {
+    //     name: 'gdg devfest spring',
+    //     longitude: '7.524058',
+    //     latitude: '6.418484',
+    //     cost: '35000',
+    //     date: 1700789948
+    // }
+    // new EventWise(client, user.address)
+    //     .createEvent(event.name, event.longitude, event.latitude, event.cost, event.date)
+    //     .then((createEvent) => { console.log({ createEvent }) });
+
+}
+main()

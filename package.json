@@ -28,6 +28,7 @@
     "run": "npx hardhat run --network hardhat scripts/run.js",
     "test:test": "hardhat test --network hardhat ./test/Test.js",
     "test:localhost": "hardhat test --network localhost ./test/Test.js",
+    "test:sepolia": "hardhat test --network sepolia ./test/Test.js",
     "deploy:localhost": "npx hardhat run --network localhost scripts/run.js",
     "deploy:sepolia": "npx hardhat run --network sepolia scripts/deploy.js",
     "fork": "npx hardhat node --fork https://eth-sepolia.g.alchemy.com/v2/[API]"

@@ -88,6 +88,10 @@ contract EventWise is Ownable, ChainlinkClient {
 
     function createPolicy(uint256 _avgEventCost) external {
         require(_avgEventCost > 0, "zero amount!");
+        require(
+            InsurancePolicy[msg.sender].isExists == false,
+            "policy exists!"
+        );
 
         uint256 premium = _avgEventCost.mul(PREMIUM_PERCENTAGE) / 100;
         InsurancePolicy[msg.sender] = Policy(_avgEventCost, premium, true);
