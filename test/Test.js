@@ -5,7 +5,9 @@ describe("EventWise", function () {
 
     before(async () => {
         provider = ethers.provider;
-        [deployer, user] = await ethers.getSigners();
+        [user] = await ethers.getSigners();
+
+        // console.log('xxx',user);return;
 
         weth = await ethers.getContractFactory("ERC20Token");
         WETH = await weth.deploy("Wrapped Ether", "WETH");
@@ -15,7 +17,7 @@ describe("EventWise", function () {
         eventWise = await EventWise.deploy(WETH.address);
         console.log("eventWise deployed to:", eventWise.address);
 
-        await WETH.transfer(user.address, parseEther("100000"));
+        // await WETH.transfer(user.address, parseEther("100000"));
     })
 
 
@@ -79,12 +81,13 @@ describe("EventWise", function () {
                 longitude: '7.524058',
                 latitude: '6.418484',
                 cost: parseEther("35000"),
-                date: 1700789948
+                date: 1700789948,
+                attendees: '1004',
             }
 
             let txn = await eventWise
                 .connect(user)
-                .createEvent(event.name, event.longitude, event.latitude, event.cost, event.date);
+                .createEvent(event.name, event.latitude, event.longitude, event.attendees, event.cost, event.date);
             let reciept = await txn.wait();
 
             expect(reciept).to.emit(EventWise, "EventCreated");
@@ -92,6 +95,7 @@ describe("EventWise", function () {
 
         it("should store event if successfull", async () => {
             let event = await eventWise.Events(user.address, 1);
+            console.log({ event })
             expect(event.name).to.equal('gdg devfest spring');
         });
 

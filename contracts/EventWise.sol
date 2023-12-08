@@ -24,8 +24,10 @@ contract EventWise is Ownable, ChainlinkClient {
         string name;
         string latitude;
         string longitude;
+        string attendees;
         uint256 cost;
         uint256 date;
+        uint256 eventId;
         bool isExists;
     }
     struct RequestDetail {
@@ -110,10 +112,19 @@ contract EventWise is Ownable, ChainlinkClient {
         string memory name,
         string memory latitude,
         string memory longitude,
+        string memory attendees,
         uint256 cost,
         uint256 date
     ) external {
-        _storeEvent(msg.sender, name, latitude, longitude, cost, date);
+        _storeEvent(
+            msg.sender,
+            name,
+            latitude,
+            longitude,
+            attendees,
+            cost,
+            date
+        );
 
         emit EventCreated(msg.sender, latestEventId[msg.sender]);
     }
@@ -208,6 +219,7 @@ contract EventWise is Ownable, ChainlinkClient {
         string memory _name,
         string memory _latitude,
         string memory _longitude,
+        string memory _attendees,
         uint256 _cost,
         uint256 _date
     ) internal {
@@ -216,8 +228,10 @@ contract EventWise is Ownable, ChainlinkClient {
             _name,
             _latitude,
             _longitude,
+            _attendees,
             _cost,
             _date,
+            eventId,
             true
         );
         latestEventId[_address] = eventId;
