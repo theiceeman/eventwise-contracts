@@ -7,12 +7,12 @@ const hre = require("hardhat");
 require('dotenv').config()
 
 // sepolia
-// const EVENTWISE_CONTRACT_ADDRESS = '0x6d7B7DE1f0114c11b8739b779d0C1dE5aF88f482';
-// const TOKEN_CONTRACT_ADDRESS = '0xC8A71BACF28e24A274b95e785c436bb5F57043Ae';
+const EVENTWISE_CONTRACT_ADDRESS = '0xe433E96c77B524EB730705Cd609d7E09756822B5';
+const TOKEN_CONTRACT_ADDRESS = '0xABDb0E084eCf355Fda82332d2BcB13316952b97B';
 
 // localhost
-const EVENTWISE_CONTRACT_ADDRESS = '0xB1377Ce3C0605919de5EEF41F6E242E8D62a4920';
-const TOKEN_CONTRACT_ADDRESS = '0xCDD4d44b772b801FF7372741148eeDE329EDFc3A';
+// const EVENTWISE_CONTRACT_ADDRESS = '0xB1377Ce3C0605919de5EEF41F6E242E8D62a4920';
+// const TOKEN_CONTRACT_ADDRESS = '0xCDD4d44b772b801FF7372741148eeDE329EDFc3A';
 
 class EventWise {
     contract;
@@ -66,27 +66,29 @@ class EventWise {
     }
 
     async viewClaims() {
-        let claims = [];
-        const events = await this.contract.getPastEvents('ClaimInitiated', {
-            fromBlock: 0,
-            toBlock: 'latest'
-        });
 
+        let claims = [];
+        let events = await this.contract.getPastEvents('ClaimInitiated', {
+          fromBlock: 0,
+          toBlock: 'latest'
+        })
+        events = events.filter((e) => e.returnValues.user === this.fromAddress);
+    
         for (const e of events) {
-            let event = await this.contract.methods
-                .Events(this.fromAddress, e.returnValues.eventId)
-                .call();
-            let claim = await this.contract.methods
-                .Claims(this.fromAddress, e.returnValues.eventId)
-                .call();
-                console.log({event, claim})
-            e.returnValues.status = claim.status == '0' ? 'pending' : 'claimed';
-            e.returnValues.eventDate = event.date;
-            e.returnValues.eventCost = event.cost;
-            claims.push(e.returnValues);
+          let event = await this.contract.methods
+            .Events(this.fromAddress, e.returnValues.eventId)
+            .call();
+          let claim = await this.contract.methods
+            .Claims(this.fromAddress, e.returnValues.eventId)
+            .call();
+          e.returnValues.status = claim.status == '0' ? 'pending' : 'claimed';
+          e.returnValues.name = event.name;
+          e.returnValues.eventDate = event.date;
+          e.returnValues.eventCost = event.cost;
+          claims.push(e.returnValues);
         }
         return claims;
-    }
+      }
 
     async createPolicy(_avgEventCost) {
         try {
@@ -190,8 +192,8 @@ class EventWise {
 }
 
 async function main() {
-    // const client = new Web3(process.env.SEPOLIA_RPC);
-    let client = new Web3('http://127.0.0.1:8545/')
+    const client = new Web3(process.env.SEPOLIA_RPC);
+    // let client = new Web3('http://127.0.0.1:8545/')
     const [user] = await hre.ethers.getSigners();
     // console.log({user});return;
 

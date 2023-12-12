@@ -166,7 +166,10 @@ contract EventWise is Ownable, ChainlinkClient {
         ClaimDetail storage claim = Claims[msg.sender][eventId];
         require(claim.status != Status.CLAIMED, "already claimed!");
 
-        if (claim.weatherCondition >= 200 && claim.weatherCondition < 800) {
+        if (
+            claim.weatherCondition / 10 ** 18 >= 200 &&
+            claim.weatherCondition / 10 ** 18 < 900
+        ) {
             claim.status = Status.CLAIMED;
             token.safeTransfer(msg.sender, _event.cost);
 
